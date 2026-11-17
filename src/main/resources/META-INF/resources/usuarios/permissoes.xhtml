@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Permissões</ui:define>
+
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <div class="painel">
+                <div class="painel-titulo">Permissões de acesso</div>
+                <div class="painel-corpo">
+                    <p class="ajuda">
+                        <strong>Administrador do sistema:</strong> todos os cadastros, configuração e usuários.
+                        <strong>Técnico:</strong> pesquisa, retenção e revisão de casos.
+                        <strong>Usuário final:</strong> pesquisa e retenção de casos.
+                    </p>
+                    <div class="barra-acoes">
+                        <p:commandButton value="Nova permissão" icon="pi pi-plus" action="#{permissaoBean.novo}"
+                                         process="@this" update="conteudoDlg" resetValues="true"
+                                         oncomplete="PF('dlg').show()"/>
+                    </div>
+                    <p:dataTable id="lista" value="#{permissaoBean.permissoes}" var="p" emptyMessage="Nenhuma permissão cadastrada.">
+                        <p:column headerText="Descrição">#{p.modulo}</p:column>
+                        <p:column headerText="Nível de acesso" style="width:14rem">#{p.nivelAcesso.descricao}</p:column>
+                        <p:column style="width:7rem">
+                            <p:commandButton icon="pi pi-pencil" title="Editar" action="#{permissaoBean.editar(p)}"
+                                             process="@this" update=":form:conteudoDlg" resetValues="true"
+                                             oncomplete="PF('dlg').show()" styleClass="ui-button-secondary"/>
+                            <p:commandButton icon="pi pi-trash" title="Excluir" action="#{permissaoBean.excluir(p)}"
+                                             process="@this" update=":form:lista" styleClass="ui-button-danger">
+                                <p:confirm header="Excluir" message="Excluir a permissão #{p.modulo}?" icon="pi pi-exclamation-triangle"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+
+            <p:dialog header="Permissão" widgetVar="dlg" modal="true" resizable="false" width="440">
+                <p:outputPanel id="conteudoDlg">
+                    <h:panelGrid columns="2" styleClass="grid-form">
+                        <p:outputLabel for="descricao" value="Descrição:"/>
+                        <p:inputText id="descricao" value="#{permissaoBean.permissao.modulo}" maxlength="100" size="30"/>
+                        <p:outputLabel for="nivel" value="Nível de acesso:"/>
+                        <p:selectOneMenu id="nivel" value="#{permissaoBean.permissao.restricao}" style="width:220px">
+                            <f:selectItems value="#{permissaoBean.niveis}" var="n" itemLabel="#{n.descricao}" itemValue="#{n.restricao}"/>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                    <div class="botoes-centro">
+                        <p:commandButton value="Salvar" icon="pi pi-save" action="#{permissaoBean.salvar}"
+                                         process="conteudoDlg" update="conteudoDlg lista"
+                                         oncomplete="if (!args.validationFailed) PF('dlg').hide()"/>
+                        <p:commandButton value="Cancelar" type="button" onclick="PF('dlg').hide()"
+                                         styleClass="ui-button-secondary"/>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

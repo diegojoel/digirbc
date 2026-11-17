@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Configurar casos</ui:define>
+
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <div class="painel">
+                <div class="painel-titulo">Configurar casos — layout de descrição do problema por módulo</div>
+                <div class="painel-corpo">
+                    <p class="ajuda">
+                        O especialista define quais campos descrevem os problemas de cada módulo e o peso de cada um
+                        na similaridade global (vizinho mais próximo ponderado). Campos com peso maior influenciam mais
+                        a escolha do caso mais similar.
+                    </p>
+                    <div class="barra-acoes">
+                        <p:outputLabel for="modulo" value="Módulo:"/>
+                        <p:selectOneMenu id="modulo" value="#{configuracaoBean.moduloId}" style="width:240px">
+                            <f:selectItem itemLabel="Selecione o módulo" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{configuracaoBean.modulos}" var="m" itemLabel="#{m.descricao}" itemValue="#{m.id}"/>
+                            <p:ajax listener="#{configuracaoBean.selecionarModulo}" update="@form"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <h:panelGroup rendered="#{not empty configuracaoBean.moduloId}">
+                        <div class="barra-acoes">
+                            <p:outputLabel for="campo" value="Campo:"/>
+                            <p:selectOneMenu id="campo" value="#{configuracaoBean.campoId}" style="width:240px">
+                                <f:selectItem itemLabel="Selecione o campo" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{configuracaoBean.campos}" var="c"
+                                               itemLabel="#{c.descricao} (#{c.tipoCampo.descricao})" itemValue="#{c.id}"/>
+                            </p:selectOneMenu>
+                            <p:outputLabel for="peso" value="Peso:"/>
+                            <p:spinner id="peso" value="#{configuracaoBean.peso}" min="1" max="10" size="3"/>
+                            <p:commandButton value="Adicionar" icon="pi pi-plus" action="#{configuracaoBean.adicionar}"
+                                             process="@this campo peso" update="@form"/>
+                        </div>
+
+                        <p:dataTable id="lista" value="#{configuracaoBean.camposDoModulo}" var="cm"
+                                     emptyMessage="Nenhum campo configurado para este módulo.">
+                            <p:column headerText="Campo">#{cm.campo.descricao}</p:column>
+                            <p:column headerText="Tipo" style="width:9rem">#{cm.campo.tipoCampo.descricao}</p:column>
+                            <p:column headerText="Peso" style="width:11rem">
+                                <p:spinner id="pesoCampo" value="#{cm.peso}" min="1" max="10" size="3">
+                                    <p:ajax listener="#{configuracaoBean.alterarPeso(cm)}" process="@this"/>
+                                </p:spinner>
+                            </p:column>
+                            <p:column headerText="Configurado por" style="width:12rem">#{cm.usuario.nome}</p:column>
+                            <p:column style="width:4rem">
+                                <p:commandButton icon="pi pi-trash" title="Remover" action="#{configuracaoBean.remover(cm)}"
+                                                 process="@this" update=":form" styleClass="ui-button-danger">
+                                    <p:confirm header="Remover" message="Remover o campo #{cm.campo.descricao} do módulo?"
+                                               icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGroup>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

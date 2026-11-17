@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Módulos</ui:define>
+
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <div class="painel">
+                <div class="painel-titulo">Módulos do sistema de automação comercial</div>
+                <div class="painel-corpo">
+                    <div class="barra-acoes">
+                        <p:commandButton value="Novo módulo" icon="pi pi-plus" action="#{moduloBean.novo}"
+                                         process="@this" update="conteudoDlg" resetValues="true"
+                                         oncomplete="PF('dlg').show()"/>
+                    </div>
+                    <p:dataTable id="lista" value="#{moduloBean.modulos}" var="m" emptyMessage="Nenhum módulo cadastrado.">
+                        <p:column headerText="Código" style="width:6rem">#{m.id}</p:column>
+                        <p:column headerText="Descrição">#{m.descricao}</p:column>
+                        <p:column style="width:7rem">
+                            <p:commandButton icon="pi pi-pencil" title="Editar" action="#{moduloBean.editar(m)}"
+                                             process="@this" update=":form:conteudoDlg" resetValues="true"
+                                             oncomplete="PF('dlg').show()" styleClass="ui-button-secondary"/>
+                            <p:commandButton icon="pi pi-trash" title="Excluir" action="#{moduloBean.excluir(m)}"
+                                             process="@this" update=":form:lista" styleClass="ui-button-danger">
+                                <p:confirm header="Excluir" message="Excluir o módulo #{m.descricao}?" icon="pi pi-exclamation-triangle"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+
+            <p:dialog header="Módulo" widgetVar="dlg" modal="true" resizable="false" width="420">
+                <p:outputPanel id="conteudoDlg">
+                    <h:panelGrid columns="2" styleClass="grid-form">
+                        <p:outputLabel for="descricao" value="Descrição:"/>
+                        <p:inputText id="descricao" value="#{moduloBean.modulo.descricao}" maxlength="100" size="30"/>
+                    </h:panelGrid>
+                    <div class="botoes-centro">
+                        <p:commandButton value="Salvar" icon="pi pi-save" action="#{moduloBean.salvar}"
+                                         process="conteudoDlg" update="conteudoDlg lista"
+                                         oncomplete="if (!args.validationFailed) PF('dlg').hide()"/>
+                        <p:commandButton value="Cancelar" action="#{moduloBean.carregar}" process="@this"
+                                         update="lista" oncomplete="PF('dlg').hide()" styleClass="ui-button-secondary"/>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

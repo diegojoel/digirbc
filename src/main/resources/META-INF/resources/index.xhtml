@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Home</ui:define>
+
+    <ui:define name="conteudo">
+        <h2>Bem-vindo, #{sessaoBean.nomeUsuario}</h2>
+        <p>
+            O DigiRBC auxilia a equipe de help desk na solução de problemas dos módulos do sistema de automação
+            comercial, recuperando soluções de problemas similares já resolvidos.
+        </p>
+
+        <div class="indicadores">
+            <div class="indicador"><div class="numero">#{homeBean.totalCasos}</div>casos na base</div>
+            <div class="indicador"><div class="numero">#{homeBean.casosValidados}</div>casos validados</div>
+            <div class="indicador"><div class="numero">#{homeBean.casosPendentes}</div>casos pendentes de revisão</div>
+            <div class="indicador"><div class="numero">#{homeBean.totalModulos}</div>módulos configurados</div>
+            <div class="indicador"><div class="numero">#{homeBean.totalPalavrasDicionario}</div>palavras no dicionário</div>
+        </div>
+
+        <h:form>
+            <div class="barra-acoes">
+                <p:button value="Pesquisar solução para um novo problema" icon="pi pi-search"
+                          outcome="/solucoes/pesquisa.xhtml"/>
+                <p:button value="Revisar casos" icon="pi pi-check-square" styleClass="ui-button-secondary"
+                          outcome="/solucoes/revisao.xhtml"
+                          rendered="#{request.isUserInRole('ADMINISTRADOR') or request.isUserInRole('TECNICO')}"/>
+            </div>
+        </h:form>
+
+        <h3>Ciclo do Raciocínio Baseado em Casos</h3>
+        <p class="ajuda">
+            Um caso é a descrição do problema (atributos do módulo, cada um com peso) mais a solução.
+            A busca percorre os casos desse módulo e devolve os mais parecidos.
+        </p>
+        <div class="ciclo">
+            <div>
+                <h4>1. Recuperar</h4>
+                Cada atributo recebe uma similaridade local. A global é a média ponderada:
+                soma de peso × similaridade, dividida pela soma dos pesos. Campo em branco entra com 0
+                e o peso continua na conta. A lista traz até 10 casos, do maior percentual para o menor.
+                Empate prefere o caso validado e, depois, o mais recente. Percentual 0 não aparece.
+            </div>
+            <div>
+                <h4>2. Reutilizar</h4>
+                Aplicar copia a solução do caso escolhido. Onde o texto cita um valor do caso antigo
+                (uma UF, um código, um status), esse valor é trocado pelo do problema novo.
+                Palavra que o dicionário trata como igual não é trocada.
+            </div>
+            <div>
+                <h4>3. Revisar</h4>
+                O caso retido nasce pendente. O técnico ajusta a solução, pode acrescentar um complemento
+                e marcar o caso como validado. Só então ele pesa como caso confirmado nas próximas buscas.
+            </div>
+            <div>
+                <h4>4. Reter</h4>
+                Grava a descrição e a solução. Se a solução veio de um caso recuperado, ficam guardados
+                o caso de origem, a similaridade e as trocas feitas. Uma descrição já existente com a
+                mesma solução não é gravada de novo.
+            </div>
+        </div>
+
+        <h3>Como cada atributo é comparado</h3>
+        <div class="ciclo">
+            <div>
+                <h4>Número</h4>
+                Medida escalar: 1 − |a − b| / (máximo − mínimo) dos valores desse atributo no módulo,
+                incluindo o problema novo. Códigos de rejeição próximos ficam com percentual alto.
+            </div>
+            <div>
+                <h4>Texto</h4>
+                Contagem de palavras em comum, depois de tirar acento e palavra irrelevante.
+                O dicionário une sinônimos: NFe, nota fiscal e NF contam como a mesma palavra.
+            </div>
+            <div>
+                <h4>Tabela</h4>
+                Se o atributo tem pares em Similaridade local, a busca usa essa tabela no lugar
+                do texto. O par vale só no sentido consulta → caso. Sem par cadastrado, vale número ou texto.
+            </div>
+            <div>
+                <h4>O que a base já tem</h4>
+                Casos de NF-e, NFC-e, SAT, PDV, TEF, estoque, financeiro e cadastros, com revisão
+                de técnico em parte deles. A tabela local cobre tipo de NF-e, ambiente, UF, status
+                e forma de pagamento.
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,366 @@
+:root {
+    --laranja: #f15a22;
+    --laranja-escuro: #d14710;
+    --grafite: #333333;
+    --cinza: #f4f4f4;
+    --borda: #d9d9d9;
+}
+
+body {
+    margin: 0;
+    background: #ffffff;
+    color: var(--grafite);
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+}
+
+a {
+    color: var(--laranja);
+}
+
+.topo {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid #ececec;
+    background: #ffffff;
+}
+
+.topo-conteudo {
+    display: flex;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 18px 16px;
+    gap: 24px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.logo .pi {
+    color: var(--laranja);
+    font-size: 30px;
+    margin-right: 6px;
+}
+
+.logo-digi {
+    color: var(--grafite);
+}
+
+.logo-rbc {
+    color: var(--laranja);
+}
+
+.menu {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    gap: 6px;
+}
+
+.menu-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 16px;
+    color: var(--grafite);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.menu-item strong {
+    font-size: 13px;
+}
+
+.menu-item small {
+    color: #999999;
+    font-style: italic;
+    font-size: 11px;
+}
+
+.submenu > strong::after {
+    content: " \25BE";
+    font-size: 10px;
+    color: #999999;
+}
+
+.submenu::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 12px;
+}
+
+.submenu-itens {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 190px;
+    background: #ffffff;
+    border: 1px solid var(--borda);
+    border-top: 3px solid var(--laranja);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    z-index: 1000;
+}
+
+.submenu:hover .submenu-itens {
+    display: block;
+}
+
+.submenu-itens a {
+    display: block;
+    padding: 9px 14px;
+    color: var(--grafite);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.submenu-itens a:hover {
+    background: var(--cinza);
+    color: var(--laranja);
+}
+
+.usuario-logado {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.usuario-logado span {
+    display: flex;
+    flex-direction: column;
+}
+
+.usuario-logado small {
+    color: #999999;
+}
+
+.usuario-logado a {
+    color: var(--grafite);
+    margin-left: 6px;
+}
+
+.conteudo {
+    max-width: 1100px;
+    margin: 24px auto 40px auto;
+    padding: 0 16px;
+    min-height: 60vh;
+}
+
+.painel {
+    border: 1px solid var(--borda);
+    margin-bottom: 24px;
+}
+
+.painel-titulo {
+    background: var(--grafite);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 10px 12px;
+}
+
+.painel-corpo {
+    padding: 16px;
+}
+
+.barra-acoes {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.botoes-centro {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+}
+
+.grid-form td {
+    padding: 4px 8px 4px 0;
+    vertical-align: middle;
+}
+
+.largura-total {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.ajuda {
+    color: #666666;
+    font-size: 13px;
+    line-height: 1.45;
+    margin: 8px 0;
+}
+
+.ui-selectonemenu-editable .ui-selectonemenu-label {
+    cursor: text;
+}
+
+.ui-inputfield:focus,
+.ui-selectonemenu.ui-state-focus {
+    box-shadow: 0 0 0 2px rgba(241, 90, 34, 0.28);
+}
+
+.ui-datatable tbody td {
+    vertical-align: top;
+    line-height: 1.4;
+}
+
+.ui-datatable td .ui-button + .ui-button {
+    margin-left: 8px;
+}
+
+.ui-growl {
+    top: 76px;
+}
+
+.substituicoes {
+    margin: 8px 0 0 0;
+    padding: 8px 12px;
+    background: #fff4ee;
+    border-left: 3px solid var(--laranja);
+}
+
+.tabela-descricao .ui-datatable-header {
+    background: var(--grafite);
+    color: #ffffff;
+    border: none;
+}
+
+.ui-datatable thead th {
+    background: var(--laranja) !important;
+    color: #ffffff !important;
+}
+
+.ui-button:not(.ui-button-secondary):not(.ui-button-flat):not(.ui-button-danger) {
+    background: var(--laranja);
+    border-color: var(--laranja-escuro);
+}
+
+.ui-button:not(.ui-button-secondary):not(.ui-button-flat):not(.ui-button-danger):enabled:hover {
+    background: var(--laranja-escuro);
+}
+
+.ui-progressbar .ui-progressbar-value {
+    background: var(--laranja) !important;
+}
+
+.indicadores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.indicador {
+    border: 1px solid var(--borda);
+    border-top: 3px solid var(--laranja);
+    padding: 14px;
+}
+
+.indicador .numero {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.ciclo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.ciclo div {
+    background: var(--cinza);
+    padding: 12px;
+}
+
+.ciclo h4 {
+    margin: 0 0 6px 0;
+    color: var(--laranja);
+}
+
+.login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--cinza);
+}
+
+.login-caixa {
+    width: 340px;
+    background: #ffffff;
+    border-top: 4px solid var(--laranja);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    padding: 28px;
+}
+
+.login-caixa .logo {
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.login-caixa label {
+    display: block;
+    margin: 12px 0 4px 0;
+}
+
+.login-caixa input[type=text],
+.login-caixa input[type=password] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid var(--borda);
+    border-radius: 4px;
+}
+
+.login-caixa button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background: var(--laranja);
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-alerta {
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    background: #fdecea;
+    color: #a12a12;
+}
+
+.login-aviso {
+    background: #edf7ed;
+    color: #1e4620;
+}
+
+.rodape {
+    text-align: center;
+    color: #999999;
+    font-size: 12px;
+    padding: 16px;
+    border-top: 1px solid #ececec;
+}
+

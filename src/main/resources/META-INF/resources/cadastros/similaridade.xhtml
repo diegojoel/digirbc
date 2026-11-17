@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Similaridade local</ui:define>
+
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <div class="painel">
+                <div class="painel-titulo">Similaridade local</div>
+                <div class="painel-corpo">
+                    <p class="ajuda">
+                        Para um atributo com pares cadastrados, a busca usa esta tabela no lugar da contagem de palavras.
+                        O par vale só no sentido informado: o valor da consulta comparado com o valor do caso.
+                        O sentido inverso é outro par. Atributo sem par continua na medida escalar (número) ou na contagem de palavras (texto).
+                        A lista dos valores mostra exemplos já usados nesse campo; também dá para digitar um valor novo.
+                    </p>
+                    <h:panelGrid columns="2" styleClass="grid-form">
+                        <p:outputLabel for="campo" value="Campo:"/>
+                        <p:selectOneMenu id="campo" value="#{similaridadeBean.campoId}" style="width:320px">
+                            <f:selectItem itemLabel="Selecione" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{similaridadeBean.campos}" var="c" itemLabel="#{c.descricao}" itemValue="#{c.id}"/>
+                            <p:ajax listener="#{similaridadeBean.selecionarCampo}" process="@this" update="consulta caso"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel for="consulta" value="Valor na consulta:"/>
+                        <p:selectOneMenu id="consulta" value="#{similaridadeBean.valorConsulta}" editable="true"
+                                         filter="true" filterMatchMode="contains" style="width:320px"
+                                         placeholder="Selecione ou digite">
+                            <f:selectItems value="#{similaridadeBean.sugestoes}" var="v" itemLabel="#{v}" itemValue="#{v}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel for="caso" value="Valor no caso:"/>
+                        <p:selectOneMenu id="caso" value="#{similaridadeBean.valorCaso}" editable="true"
+                                         filter="true" filterMatchMode="contains" style="width:320px"
+                                         placeholder="Selecione ou digite">
+                            <f:selectItems value="#{similaridadeBean.sugestoes}" var="v" itemLabel="#{v}" itemValue="#{v}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel for="percentual" value="Similaridade (%):"/>
+                        <p:inputNumber id="percentual" value="#{similaridadeBean.percentual}" minValue="0" maxValue="100"
+                                       decimalPlaces="0" style="width:8rem"/>
+                    </h:panelGrid>
+                    <div class="barra-acoes">
+                        <p:commandButton value="Salvar par" icon="pi pi-save" action="#{similaridadeBean.salvar}"
+                                         process="@form" update="@form"/>
+                    </div>
+                    <p:dataTable id="lista" value="#{similaridadeBean.pares}" var="s"
+                                 emptyMessage="Nenhum par cadastrado.">
+                        <p:column headerText="Campo">#{s.campo.descricao}</p:column>
+                        <p:column headerText="Consulta">#{s.valorConsulta}</p:column>
+                        <p:column headerText="Caso">#{s.valorCaso}</p:column>
+                        <p:column headerText="Similaridade" style="width:8rem">#{s.percentual}%</p:column>
+                        <p:column style="width:4rem">
+                            <p:commandButton icon="pi pi-trash" title="Excluir" action="#{similaridadeBean.excluir(s)}"
+                                             process="@this" update="@form" styleClass="ui-button-danger">
+                                <p:confirm header="Excluir" message="Excluir este par?" icon="pi pi-exclamation-triangle"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

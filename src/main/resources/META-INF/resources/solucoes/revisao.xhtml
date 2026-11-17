@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Revisar casos</ui:define>
+
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <div class="painel">
+                <div class="painel-titulo">Revisar casos</div>
+                <div class="painel-corpo">
+                    <div class="barra-acoes">
+                        <p:outputLabel for="filtroModulo" value="Módulo:"/>
+                        <p:selectOneMenu id="filtroModulo" value="#{revisaoBean.filtroModuloId}" style="width:220px">
+                            <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                            <f:selectItems value="#{revisaoBean.modulos}" var="m" itemLabel="#{m.descricao}" itemValue="#{m.id}"/>
+                            <p:ajax listener="#{revisaoBean.filtrar}" update="casos"/>
+                        </p:selectOneMenu>
+                        <p:selectBooleanCheckbox value="#{revisaoBean.somentePendentes}" itemLabel="Somente pendentes de revisão">
+                            <p:ajax listener="#{revisaoBean.filtrar}" update="casos"/>
+                        </p:selectBooleanCheckbox>
+                    </div>
+
+                    <p:dataTable id="casos" value="#{revisaoBean.casos}" var="c" paginator="true" rows="10"
+                                 paginatorPosition="bottom" emptyMessage="Nenhum caso para revisar.">
+                        <p:column headerText="Caso" style="width:4rem">nº #{c.id}</p:column>
+                        <p:column headerText="Módulo" style="width:9rem">#{c.modulo.descricao}</p:column>
+                        <p:column headerText="Inclusão" style="width:8rem">
+                            <h:outputText value="#{c.dataInclusao}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Solução">#{c.solucao}</p:column>
+                        <p:column headerText="Situação" style="width:7rem">
+                            <p:tag value="#{c.valido ? 'Validado' : 'Pendente'}" severity="#{c.valido ? 'success' : 'warning'}"/>
+                        </p:column>
+                        <p:column style="width:7rem">
+                            <p:commandButton value="Revisar" icon="pi pi-pencil" action="#{revisaoBean.revisar(c)}"
+                                             process="@this" update=":form:dlgRevisao"
+                                             oncomplete="PF('dlgRevisao').show()"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+
+            <p:dialog id="dlgRevisao" widgetVar="dlgRevisao" header="Revisão do caso nº #{revisaoBean.caso.id}"
+                      modal="true" width="760" resizable="false" responsive="true">
+                <p:outputPanel id="conteudoRevisao">
+                <h:panelGroup rendered="#{not empty revisaoBean.caso}">
+                    <h4 style="margin-top:0">Descrição do problema (#{revisaoBean.caso.modulo.descricao})</h4>
+                    <h:dataTable value="#{revisaoBean.caso.detalhes}" var="d" cellpadding="3">
+                        <h:column><strong>#{d.campoDoModulo.campo.descricao}:</strong></h:column>
+                        <h:column>#{empty d.valor ? '—' : d.valor}</h:column>
+                    </h:dataTable>
+                    <p class="ajuda" rendered="#{not empty revisaoBean.caso.casoOrigem}">
+                        Recuperado do caso nº #{revisaoBean.caso.casoOrigem.id} (#{revisaoBean.caso.percentualOrigem}%).
+                        #{revisaoBean.caso.adaptacao}
+                    </p>
+
+                    <h4>Solução</h4>
+                    <p:inputTextarea id="solucaoRevisao" value="#{revisaoBean.solucao}" rows="6" maxlength="1000"
+                                     styleClass="largura-total" autoResize="false"/>
+                    <div style="margin-top:8px">
+                        <p:selectBooleanCheckbox value="#{revisaoBean.valido}" itemLabel="Caso validado"/>
+                    </div>
+                    <div class="botoes-centro">
+                        <p:commandButton value="Salvar revisão" icon="pi pi-save" action="#{revisaoBean.salvar}"
+                                         process="conteudoRevisao" update="casos conteudoRevisao"
+                                         oncomplete="if (!args.validationFailed) PF('dlgRevisao').hide()"/>
+                    </div>
+
+                    <h4>Complementos da solução</h4>
+                    <p:dataTable id="complementos" value="#{revisaoBean.complementos}" var="cs"
+                                 emptyMessage="Nenhum complemento registrado.">
+                        <p:column headerText="Técnico" style="width:10rem">#{cs.usuario.nome}</p:column>
+                        <p:column headerText="Complemento">#{cs.descricao}</p:column>
+                    </p:dataTable>
+                    <div class="barra-acoes" style="margin-top:8px">
+                        <p:inputText id="complemento" value="#{revisaoBean.complemento}" maxlength="500"
+                                     placeholder="Complementar a solução" style="flex:1"/>
+                        <p:commandButton value="Adicionar" icon="pi pi-plus" action="#{revisaoBean.complementar}"
+                                         process="@this complemento" update="complementos complemento"
+                                         styleClass="ui-button-secondary"/>
+                    </div>
+                </h:panelGroup>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

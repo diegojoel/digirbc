@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Sobre</ui:define>
+
+    <ui:define name="conteudo">
+        <div class="painel">
+            <div class="painel-titulo">Sobre o sistema</div>
+            <div class="painel-corpo">
+                <p>
+                    Implementação do sistema descrito no artigo <em>"Aplicação de Raciocínio Baseado em Casos no
+                    suporte a decisão de um sistema web de help desk"</em> (Diego Joel Pilger e Marcel Hugo — FURB, 2012).
+                </p>
+                <h4>Técnicas de RBC utilizadas</h4>
+                <ul>
+                    <li><strong>Representação dos casos:</strong> atributo-valor.</li>
+                    <li><strong>Medida de similaridade:</strong> simétrica (sim(A,B) = sim(B,A)).</li>
+                    <li><strong>Similaridade global:</strong> vizinho mais próximo (nearest neighbour) ponderado.</li>
+                    <li><strong>Similaridade local numérica:</strong> escalar, 1 − |a − b| / (máximo − mínimo).</li>
+                    <li><strong>Similaridade local texto:</strong> contagem de palavras em comum, com o dicionário de dados.</li>
+                    <li><strong>Recuperação:</strong> sequencial.</li>
+                    <li><strong>Adaptação:</strong> substitucional.</li>
+                    <li><strong>Retenção:</strong> das soluções pelos problemas descritos.</li>
+                </ul>
+                <h4>Tecnologias</h4>
+                <p>Java 11, Spring Boot, JSF com PrimeFaces, JPA (Hibernate) no padrão MVC, com PostgreSQL ou H2.</p>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

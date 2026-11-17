@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Dicionário de dados</ui:define>
+
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <div class="painel">
+                <div class="painel-titulo">Dicionário de dados</div>
+                <div class="painel-corpo">
+                    <p class="ajuda">
+                        Na busca de casos similares, a palavra-chave e todas as suas palavras equivalentes são consideradas
+                        a mesma palavra. Ex.: "NFe" equivale a "nota fiscal", "nota fiscal eletrônica" e "NF".
+                    </p>
+                    <div class="barra-acoes">
+                        <p:commandButton value="Nova palavra-chave" icon="pi pi-plus" action="#{dicionarioBean.novo}"
+                                         process="@this" update="conteudoDlg" resetValues="true"
+                                         oncomplete="PF('dlg').show()"/>
+                    </div>
+                    <p:dataTable id="lista" value="#{dicionarioBean.palavras}" var="d"
+                                 emptyMessage="Nenhuma palavra-chave cadastrada.">
+                        <p:column headerText="Palavra-chave" style="width:14rem">#{d.palavraChave}</p:column>
+                        <p:column headerText="Palavras equivalentes">#{dicionarioBean.equivalentesDe(d)}</p:column>
+                        <p:column style="width:7rem">
+                            <p:commandButton icon="pi pi-pencil" title="Editar" action="#{dicionarioBean.editar(d)}"
+                                             process="@this" update=":form:conteudoDlg" resetValues="true"
+                                             oncomplete="PF('dlg').show()" styleClass="ui-button-secondary"/>
+                            <p:commandButton icon="pi pi-trash" title="Excluir" action="#{dicionarioBean.excluir(d)}"
+                                             process="@this" update=":form:lista" styleClass="ui-button-danger">
+                                <p:confirm header="Excluir" message="Excluir a palavra-chave #{d.palavraChave}?"
+                                           icon="pi pi-exclamation-triangle"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+
+            <p:dialog header="Palavra-chave" widgetVar="dlg" modal="true" resizable="false" width="460">
+                <p:outputPanel id="conteudoDlg">
+                    <h:panelGrid columns="1" styleClass="grid-form largura-total">
+                        <p:outputLabel for="palavraChave" value="Palavra-chave:"/>
+                        <p:inputText id="palavraChave" value="#{dicionarioBean.palavraChave}" maxlength="100"
+                                     styleClass="largura-total"/>
+                        <p:outputLabel for="equivalentes" value="Palavras equivalentes (uma por linha):"/>
+                        <p:inputTextarea id="equivalentes" value="#{dicionarioBean.equivalentes}" rows="7"
+                                         styleClass="largura-total" autoResize="false"/>
+                    </h:panelGrid>
+                    <div class="botoes-centro">
+                        <p:commandButton value="Salvar" icon="pi pi-save" action="#{dicionarioBean.salvar}"
+                                         process="conteudoDlg" update="conteudoDlg lista"
+                                         oncomplete="if (!args.validationFailed) PF('dlg').hide()"/>
+                        <p:commandButton value="Cancelar" type="button" onclick="PF('dlg').hide()"
+                                         styleClass="ui-button-secondary"/>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

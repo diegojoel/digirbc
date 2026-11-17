@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Usuários</ui:define>
+
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <div class="painel">
+                <div class="painel-titulo">Usuários</div>
+                <div class="painel-corpo">
+                    <div class="barra-acoes">
+                        <p:commandButton value="Novo usuário" icon="pi pi-plus" action="#{usuarioBean.novo}"
+                                         process="@this" update="conteudoDlg" resetValues="true"
+                                         oncomplete="PF('dlg').show()"/>
+                    </div>
+                    <p:dataTable id="lista" value="#{usuarioBean.usuarios}" var="u" emptyMessage="Nenhum usuário cadastrado.">
+                        <p:column headerText="Nome">#{u.nome}</p:column>
+                        <p:column headerText="Login" style="width:10rem">#{u.acessoAlternativo}</p:column>
+                        <p:column headerText="Permissão">
+                            #{u.permissao.rotulo}
+                        </p:column>
+                        <p:column headerText="Inclusão" style="width:8rem">
+                            <h:outputText value="#{u.dataInclusao}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column style="width:7rem">
+                            <p:commandButton icon="pi pi-pencil" title="Editar" action="#{usuarioBean.editar(u)}"
+                                             process="@this" update=":form:conteudoDlg" resetValues="true"
+                                             oncomplete="PF('dlg').show()" styleClass="ui-button-secondary"/>
+                            <p:commandButton icon="pi pi-trash" title="Excluir" action="#{usuarioBean.excluir(u)}"
+                                             process="@this" update=":form:lista" styleClass="ui-button-danger">
+                                <p:confirm header="Excluir" message="Excluir o usuário #{u.nome}?" icon="pi pi-exclamation-triangle"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+
+            <p:dialog header="Usuário" widgetVar="dlg" modal="true" resizable="false" width="520">
+                <p:outputPanel id="conteudoDlg">
+                    <h:panelGrid columns="2" styleClass="grid-form">
+                        <p:outputLabel for="nome" value="Nome:"/>
+                        <p:inputText id="nome" value="#{usuarioBean.usuario.nome}" maxlength="100" size="30"/>
+                        <p:outputLabel for="login" value="Login:"/>
+                        <p:inputText id="login" value="#{usuarioBean.usuario.acessoAlternativo}" maxlength="100" size="30"/>
+                        <p:outputLabel for="senha" value="Senha:"/>
+                        <h:panelGroup>
+                            <p:password id="senha" value="#{usuarioBean.senha}" size="30" redisplay="false"/>
+                            <ui:fragment rendered="#{not empty usuarioBean.usuario.id}">
+                                <div class="ajuda">Deixe em branco para manter a senha atual.</div>
+                            </ui:fragment>
+                        </h:panelGroup>
+                        <p:outputLabel for="permissao" value="Permissão:"/>
+                        <p:selectOneMenu id="permissao" value="#{usuarioBean.permissaoId}" style="width:320px">
+                            <f:selectItem itemLabel="Selecione" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{usuarioBean.permissoes}" var="p"
+                                           itemLabel="#{p.rotulo}" itemValue="#{p.id}"/>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                    <div class="botoes-centro">
+                        <p:commandButton value="Salvar" icon="pi pi-save" action="#{usuarioBean.salvar}"
+                                         process="conteudoDlg" update="conteudoDlg lista"
+                                         oncomplete="if (!args.validationFailed) PF('dlg').hide()"/>
+                        <p:commandButton value="Cancelar" action="#{usuarioBean.carregar}" process="@this"
+                                         update="lista" oncomplete="PF('dlg').hide()" styleClass="ui-button-secondary"/>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

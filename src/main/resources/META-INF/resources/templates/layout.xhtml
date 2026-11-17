@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <f:facet name="first">
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    </f:facet>
+    <title>DigiRBC - <ui:insert name="titulo">Help Desk</ui:insert></title>
+    <link rel="stylesheet" type="text/css" href="#{request.contextPath}/javax.faces.resource/digirbc.css.xhtml?ln=css&amp;v=4"/>
+</h:head>
+<h:body>
+    <header class="topo">
+        <div class="topo-conteudo">
+            <a class="logo" href="#{request.contextPath}/index.xhtml">
+                <i class="pi pi-sun"></i><span class="logo-digi">DIGI</span><span class="logo-rbc">RBC</span>
+            </a>
+            <nav class="menu">
+                <a class="menu-item" href="#{request.contextPath}/index.xhtml">
+                    <strong>HOME</strong><small>tudo inicia aqui!</small>
+                </a>
+                <ui:fragment rendered="#{request.isUserInRole('ADMINISTRADOR')}">
+                    <div class="menu-item submenu">
+                        <strong>CADASTROS</strong><small>cadastros</small>
+                        <div class="submenu-itens">
+                            <a href="#{request.contextPath}/cadastros/modulos.xhtml">Módulos</a>
+                            <a href="#{request.contextPath}/cadastros/campos.xhtml">Campos</a>
+                            <a href="#{request.contextPath}/cadastros/configuracao.xhtml">Configurar casos</a>
+                            <a href="#{request.contextPath}/cadastros/dicionario.xhtml">Dicionário de dados</a>
+                            <a href="#{request.contextPath}/cadastros/similaridade.xhtml">Similaridade local</a>
+                            <a href="#{request.contextPath}/cadastros/casos.xhtml">Manter casos</a>
+                        </div>
+                    </div>
+                </ui:fragment>
+                <div class="menu-item submenu">
+                    <strong>SOLUÇÕES</strong><small>buscar solução</small>
+                    <div class="submenu-itens">
+                        <a href="#{request.contextPath}/solucoes/pesquisa.xhtml">Pesquisa de casos</a>
+                        <ui:fragment rendered="#{request.isUserInRole('ADMINISTRADOR') or request.isUserInRole('TECNICO')}">
+                            <a href="#{request.contextPath}/solucoes/revisao.xhtml">Revisar casos</a>
+                        </ui:fragment>
+                    </div>
+                </div>
+                <ui:fragment rendered="#{request.isUserInRole('ADMINISTRADOR')}">
+                    <div class="menu-item submenu">
+                        <strong>USUÁRIOS</strong><small>controle de usuários</small>
+                        <div class="submenu-itens">
+                            <a href="#{request.contextPath}/usuarios/usuarios.xhtml">Usuários</a>
+                            <a href="#{request.contextPath}/usuarios/permissoes.xhtml">Permissões</a>
+                        </div>
+                    </div>
+                </ui:fragment>
+                <a class="menu-item" href="#{request.contextPath}/sobre.xhtml">
+                    <strong>SOBRE</strong><small>sobre o sistema</small>
+                </a>
+            </nav>
+            <div class="usuario-logado">
+                <i class="pi pi-user"></i>
+                <span>#{sessaoBean.nomeUsuario}<small>#{sessaoBean.perfil}</small></span>
+                <a href="#{request.contextPath}/logout" title="Sair"><i class="pi pi-sign-out"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="conteudo">
+        <p:growl id="mensagens" showDetail="false" life="6000">
+            <p:autoUpdate/>
+        </p:growl>
+        <ui:insert name="conteudo"/>
+    </main>
+
+    <h:form id="formConfirmacao">
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="380">
+            <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"/>
+            <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"/>
+        </p:confirmDialog>
+    </h:form>
+
+    <footer class="rodape">
+        DigiRBC — Sistema web de help desk com Raciocínio Baseado em Casos
+    </footer>
+</h:body>
+</html>

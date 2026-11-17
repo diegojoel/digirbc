@@ -1,0 +1,166 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/layout.xhtml">
+
+    <ui:define name="titulo">Pesquisa de casos</ui:define>
+
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <div class="painel">
+                <div class="painel-titulo">Pesquisa de casos</div>
+                <div class="painel-corpo">
+                    <h:panelGrid columns="4" styleClass="grid-form">
+                        <p:outputLabel for="modulo" value="Módulo do sistema:"/>
+                        <p:selectOneMenu id="modulo" value="#{pesquisaBean.moduloId}" style="width:260px">
+                            <f:selectItem itemLabel="Selecione o módulo" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{pesquisaBean.modulos}" var="m" itemLabel="#{m.descricao}" itemValue="#{m.id}"/>
+                            <p:ajax listener="#{pesquisaBean.selecionarModulo}" process="@this" update="@form"/>
+                        </p:selectOneMenu>
+                        <p:selectBooleanCheckbox id="somenteValidos" value="#{pesquisaBean.somenteValidos}"
+                                                 itemLabel="Somente casos validados"/>
+                    </h:panelGrid>
+
+                    <h:panelGroup rendered="#{empty pesquisaBean.moduloId}">
+                        <p class="ajuda">Escolha o módulo do sistema para descrever o problema e buscar uma solução.</p>
+                    </h:panelGroup>
+
+                    <p:dataTable id="descricao" value="#{pesquisaBean.campos}" var="cm" styleClass="tabela-descricao"
+                                 rendered="#{not empty pesquisaBean.campos}" style="margin-top:12px">
+                        <f:facet name="header">Descrição do novo caso</f:facet>
+                        <p:column headerText="Campo" style="width:35%">
+                            #{cm.campo.descricao}
+                        </p:column>
+                        <p:column headerText="Descrição — digite ou selecione">
+                            <p:selectOneMenu value="#{pesquisaBean.valores[cm.id]}" editable="true"
+                                             filter="true" filterMatchMode="contains" styleClass="largura-total"
+                                             placeholder="Digite ou selecione" title="Digite um valor ou escolha um da lista">
+                                <f:selectItems value="#{pesquisaBean.sugestoes[cm.id]}" var="v" itemLabel="#{v}" itemValue="#{v}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:dataTable>
+
+                    <h:panelGroup rendered="#{not empty pesquisaBean.campos}">
+                        <p class="ajuda">
+                            Digite o valor ou escolha um da lista. Em branco, entra na conta com similaridade 0 e o peso permanece.
+                        </p>
+                    </h:panelGroup>
+                    <ui:fragment rendered="#{not empty pesquisaBean.moduloId and empty pesquisaBean.campos}">
+                        <p class="ajuda">Este módulo ainda não teve a descrição do problema configurada pelo especialista.</p>
+                    </ui:fragment>
+
+                    <h:panelGrid columns="2" styleClass="grid-form largura-total" columnClasses="rotulo,"
+                                 rendered="#{not empty pesquisaBean.campos}" style="margin-top:16px">
+                        <p:outputLabel for="solucao" value="Solução do problema:"/>
+                        <h:panelGroup>
+                            <p:inputTextarea id="solucao" value="#{pesquisaBean.solucao}" rows="7"
+                                             styleClass="largura-total" maxlength="1000" autoResize="false"
+                                             counter="contador" counterTemplate="{0} caracteres restantes"/>
+                            <h:outputText id="contador" styleClass="ajuda"/>
+                            <ui:fragment rendered="#{not empty pesquisaBean.aplicado}">
+                                <div class="ajuda">
+                                    Solução reutilizada do caso nº #{pesquisaBean.aplicado.caso.id}
+                                    (#{pesquisaBean.aplicado.percentual}% de similaridade). Revise-a antes de reter o caso.
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{not empty pesquisaBean.substituicoes}">
+                                <div class="substituicoes">
+                                    <strong>Adaptação substitucional:</strong>
+                                    <ui:repeat value="#{pesquisaBean.substituicoes}" var="s"> #{s};</ui:repeat>
+                                </div>
+                            </ui:fragment>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <h:panelGroup layout="block" styleClass="barra-acoes" rendered="#{not empty pesquisaBean.campos}">
+                        <p:commandButton value="Pesquisar" icon="pi pi-search" action="#{pesquisaBean.pesquisar}"
+                                         update="@form"/>
+                        <p:commandButton value="Reter caso" icon="pi pi-save" action="#{pesquisaBean.reter}"
+                                         update="@form"/>
+                        <p:commandButton value="Cancelar" icon="pi pi-times" action="#{pesquisaBean.cancelar}"
+                                         process="@this" update="@form" styleClass="ui-button-secondary"/>
+                    </h:panelGroup>
+                </div>
+            </div>
+
+            <h:panelGroup rendered="#{pesquisaBean.pesquisou}">
+                <div class="painel">
+                    <div class="painel-titulo">Casos similares recuperados</div>
+                    <div class="painel-corpo">
+                        <p:dataTable id="resultados" value="#{pesquisaBean.resultados}" var="r" rowIndexVar="i"
+                                     rowKey="#{r.caso.id}"
+                                     emptyMessage="Nenhum caso parecido com o problema descrito.">
+                            <p:column style="width:2rem">
+                                <p:rowToggler/>
+                            </p:column>
+                            <p:column headerText="#" style="width:2.5rem">#{i + 1}</p:column>
+                            <p:column headerText="Similaridade" style="width:150px">
+                                <p:progressBar value="#{r.percentual}" labelTemplate="{value}%" displayOnly="true"/>
+                            </p:column>
+                            <p:column headerText="Caso" style="width:4rem">nº #{r.caso.id}</p:column>
+                            <p:column headerText="Solução">#{r.caso.solucao}</p:column>
+                            <p:column headerText="Situação" style="width:7rem">
+                                <p:tag value="#{r.caso.valido ? 'Validado' : 'Pendente'}"
+                                       severity="#{r.caso.valido ? 'success' : 'warning'}"/>
+                            </p:column>
+                            <p:column style="width:7rem">
+                                <p:commandButton value="Aplicar" icon="pi pi-check" action="#{pesquisaBean.aplicar(r)}"
+                                                 process="@this" update="@form"/>
+                            </p:column>
+                            <p:rowExpansion>
+                                <h:dataTable value="#{r.atributos}" var="a" styleClass="largura-total"
+                                             style="border-collapse:collapse" cellpadding="4">
+                                    <h:column>
+                                        <f:facet name="header">Atributo</f:facet>
+                                        #{a.campo}
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">Peso</f:facet>
+                                        #{a.peso}
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">Novo problema</f:facet>
+                                        #{a.valorProblema}
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">Caso nº #{r.caso.id}</f:facet>
+                                        #{empty a.valorCaso ? '—' : a.valorCaso}
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">Similaridade local</f:facet>
+                                        #{a.percentual}%
+                                    </h:column>
+                                </h:dataTable>
+                                <p class="ajuda">
+                                    Registrado em
+                                    <h:outputText value="#{r.caso.dataInclusao}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo"/>
+                                    </h:outputText>
+                                    por #{r.caso.usuario.nome}.
+                                </p>
+                            </p:rowExpansion>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </h:panelGroup>
+
+            <p:dialog id="retido" header="Caso retido" widgetVar="dlgRetido" closable="false" modal="true"
+                      visible="#{pesquisaBean.retido}" resizable="false">
+                <h:outputText value="Caso nº #{pesquisaBean.casoRetido.id} retido com sucesso na base de casos."/>
+                <br/>
+                <h:outputText styleClass="ajuda" value="Ele ficará pendente até ser revisado por um técnico."/>
+                <h:panelGroup rendered="#{not empty pesquisaBean.casoRetido.casoOrigem}">
+                    <br/>
+                    <h:outputText styleClass="ajuda"
+                                  value="Recuperado do caso nº #{pesquisaBean.casoRetido.casoOrigem.id} (#{pesquisaBean.casoRetido.percentualOrigem}%). #{pesquisaBean.casoRetido.adaptacao}"/>
+                </h:panelGroup>
+                <div class="botoes-centro">
+                    <p:commandButton value="Fechar" action="#{pesquisaBean.cancelar}" process="@this" update="@form"
+                                     onstart="PF('dlgRetido').hide()"/>
+                </div>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
